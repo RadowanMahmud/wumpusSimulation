@@ -146,15 +146,26 @@ public class MainApplication extends Application {
                 "    -fx-font-size: 20px;-fx-color:aqua");
         root.setTop(topBar);
 
+        BorderPane instructions = new BorderPane();
+        Label textq = new Label("For Manual Play \nw => Up Move , s => Down Move , a => Left Move , d => Right Move ");
+        label.setTextFill(Color.valueOf("black"));
+        instructions.setStyle("-fx-padding: 8px;\n" +
+                "    -fx-font-size: 15px;");
+        instructions.setLeft(textq);
+
         BorderPane footer = new BorderPane();
 
-        Label text = new Label("@Developed By: Radowan, Khalil!");
+        Label text = new Label("@Developed By: Radowan, Khalil, Shahriyar!");
         label.setTextFill(Color.valueOf("white"));
 
         footer.setLeft(text);
         footer.setStyle("-fx-padding: 10px;\n" +
                 "    -fx-font-size: 10px;-fx-color:aqua");
-        root.setBottom(footer);
+
+        BorderPane bottom = new BorderPane();
+        bottom.setTop(instructions);
+        bottom.setBottom(footer);
+        root.setBottom(bottom);
 
 
 
@@ -169,7 +180,7 @@ public class MainApplication extends Application {
         vbox.getChildren().add(gp);
         root.setLeft(vbox);
         stage.setTitle("Wumpus World!");
-        Scene sc =new Scene(root, 706, 800);
+        Scene sc =new Scene(root, 706, 855);
                 sc.setOnKeyPressed(new EventHandler<KeyEvent>() {
                     @Override
                     public void handle(KeyEvent event) {
