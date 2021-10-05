@@ -9,7 +9,7 @@ public class WumpusWorldGenerator {
     public String[][] getGeneratedBoard(){
         prepareBoard();
         setGoldInBoard();
-        placeWumpusOnBoard();
+        placeWumpusOnBoard(2);
         int pitNumber = raandom.nextInt(5)+5;
         for(int i=0;i<pitNumber;i++){
             placePitsOnBoard();
@@ -32,15 +32,17 @@ public class WumpusWorldGenerator {
         setEnvironment(ranx,rany,"glitter");
     }
 
-    public void placeWumpusOnBoard(){
-        int ranx = raandom.nextInt(9)+1;
-        int rany = raandom.nextInt(9)+1;
-        if(board[ranx][rany].equals(" ")){
-            board[ranx][rany]="wumpus";
-        }else{
-            board[ranx][rany]=board[ranx][rany]+" "+"wumpus";
+    public void placeWumpusOnBoard(int numberOfWumpusMonster){
+        for(int i=0;i<numberOfWumpusMonster;i++){
+            int ranx = raandom.nextInt(9)+1;
+            int rany = raandom.nextInt(9)+1;
+            if(board[ranx][rany].equals(" ")){
+                board[ranx][rany]="wumpus";
+                setEnvironment(ranx,rany,"stench");
+            }else{
+                i--;
+            }
         }
-        setEnvironment(ranx,rany,"stench");
     }
 
     public void placePitsOnBoard(){
@@ -60,16 +62,16 @@ public class WumpusWorldGenerator {
     }
 
     public void setEnvironment(int x,int y,String env){
-        if(x-1>=0 && board[x-1][y]!="pit"){
+        if(x-1>=0 && board[x-1][y]!="pit" && board[x-1][y]!="wumpus" && board[x-1][y]!="gold"){
             placeEnvValue(x-1,y,env);
         }
-        if(x+1<10 && board[x+1][y]!="pit"){
+        if(x+1<10 && board[x+1][y]!="pit" && board[x+1][y]!="wumpus" && board[x+1][y]!="gold"){
             placeEnvValue(x+1,y,env);
         }
-        if(y-1>=0 && board[x][y-1]!="pit"){
+        if(y-1>=0 && board[x][y-1]!="pit" && board[x][y-1]!="wumpus" && board[x][y-1]!="gold"){
             placeEnvValue(x,y-1,env);
         }
-        if(y+1<10 && board[x][y+1]!="pit"){
+        if(y+1<10 && board[x][y+1]!="pit" && board[x][y+1]!="wumpus" && board[x][y+1]!="gold"){
             placeEnvValue(x,y+1,env);
         }
     }

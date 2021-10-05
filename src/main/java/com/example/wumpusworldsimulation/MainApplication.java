@@ -1,9 +1,16 @@
 package com.example.wumpusworldsimulation;
 
 import com.example.wumpusworldsimulation.Board.Agent;
+import com.example.wumpusworldsimulation.Board.LogicClass;
 import com.example.wumpusworldsimulation.Board.WumpusWorldGenerator;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.paint.ImagePattern;
 import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -18,6 +25,7 @@ import javafx.scene.text.Text;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MainApplication extends Application {
 
@@ -27,6 +35,7 @@ public class MainApplication extends Application {
 //    PropositionalLogicResolution propositionalLogicResolution = new PropositionalLogicResolution();
 //    AgentPercept agentPercept = new AgentPercept();
     Agent agent = new Agent();
+    LogicClass logic = new LogicClass(agent);
 
 
     @Override
@@ -36,14 +45,6 @@ public class MainApplication extends Application {
         //generating my world
         WumpusWorldGenerator generator= new WumpusWorldGenerator();
         world = generator.getGeneratedBoard();
-        Map<String, Integer> list = new HashMap<String, Integer>();
-        list.put("", 0);
-        list.put("wumpus", 1);
-        list.put("stench", 2);
-        list.put("pit", 3);
-        list.put("breeze", 4);
-        list.put("gold", 5);
-        list.put("glitter", 6);
 
         VBox vbox = new VBox();
 
@@ -69,20 +70,51 @@ public class MainApplication extends Application {
 
                 Iterator value = in.iterator();
                 while (value.hasNext()) {
-                    output = output + "\n" + value.next();
+                    if(in.size()==1){
+                        output = (String) value.next();
+                    }
+                    else output = output + "\n" + value.next();
                 }
 
                 Text text = new Text(output);
                 GridPane.setRowIndex(rec, row);
                 GridPane.setColumnIndex(rec, col);
-                GridPane.setRowIndex(text, row);
-                GridPane.setColumnIndex(text, col);
-                GridPane.setMargin(text, new Insets(0,0,0,4));
-                text.setStyle("-fx-padding: 10px;\n" +
-                        "    -fx-font-size: 14px;-fx-color:aqua");
-                text.setVisible(true);
-
-                gp.getChildren().addAll(rec, text);
+                Rectangle recsmall = new Rectangle();
+                recsmall.setWidth(55);
+                recsmall.setHeight(55);
+                if(output.equals("wumpus")){
+                    Image monster = new Image("monster.jpg",false);
+                    recsmall.setFill(new ImagePattern(monster));
+                    GridPane.setRowIndex(recsmall, row);
+                    GridPane.setColumnIndex(recsmall, col);
+                    GridPane.setMargin(recsmall, new Insets(0,0,0,5));
+                    gp.getChildren().addAll( rec,recsmall);
+                }
+                else if(output.equals("gold")){
+                    Image monster = new Image("gold.jpg",false);
+                    recsmall.setFill(new ImagePattern(monster));
+                    GridPane.setRowIndex(recsmall, row);
+                    GridPane.setColumnIndex(recsmall, col);
+                    GridPane.setMargin(recsmall, new Insets(0,0,0,5));
+                    gp.getChildren().addAll( rec,recsmall);
+                }
+                else if(output.equals("pit")){
+                    Image monster = new Image("pit.png",false);
+                    recsmall.setFill(new ImagePattern(monster));
+                    GridPane.setRowIndex(recsmall, row);
+                    GridPane.setColumnIndex(recsmall, col);
+                    GridPane.setMargin(recsmall, new Insets(0,0,0,5));
+                    gp.getChildren().addAll( rec,recsmall);
+                }
+                else{
+                    GridPane.setRowIndex(text, row);
+                    GridPane.setColumnIndex(text, col);
+                    GridPane.setMargin(text, new Insets(0,0,0,4));
+                    text.setStyle("-fx-padding: 10px;\n" +
+                            "    -fx-font-size: 14px;-fx-color:aqua");
+                    text.setVisible(true);
+                    gp.getChildren().addAll(rec, text);
+                }
             }
         }
 
@@ -96,8 +128,7 @@ public class MainApplication extends Application {
         btn.setOnAction(e -> {
             changePlayerPosition(0, 0);
             agent.base.printKB();
-//
-//            startSimulation();
+           startSimulation();
         });
 
         topBar.setRight(btn);
@@ -118,17 +149,67 @@ public class MainApplication extends Application {
 
 
 
-        circle.setFill(Color.valueOf("Red"));
-        circle.setRadius(12);
-        circle.setUserData("Player");
+        //circle.setFill(Color.valueOf("Red"));
+        Image im = new Image("wumpus.png",false);
+        circle.setFill(new ImagePattern(im));
+        circle.setRadius(30);
         GridPane.setRowIndex(circle,agent.getCurrentRow());
         GridPane.setColumnIndex(circle,agent.getCurrentCol());
         gp.getChildren().add(circle);
-        GridPane.setMargin(circle, new Insets(0,0,0,20));
+        //GridPane.setMargin(circle, new Insets(0,0,0,0));
         vbox.getChildren().add(gp);
         root.setLeft(vbox);
         stage.setTitle("Wumpus World!");
-        stage.setScene(new Scene(root, 706, 800));
+        Scene sc =new Scene(root, 706, 800);
+                sc.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                    @Override
+                    public void handle(KeyEvent event) {
+                        switch (event.getCode()) {
+                            case W:  {
+                                System.out.println("up");
+                                if(agent.getCurrentRow()>0){
+                                    //code for image rotation
+//                                    ImageView iv = new ImageView(im);
+//                                    iv.setRotate(270);
+//                                    SnapshotParameters params = new SnapshotParameters();
+//                                    params.setFill(Color.TRANSPARENT);
+//                                    Image rotatedImage = iv.snapshot(params, null);
+//                                    circle.setFill(new ImagePattern(rotatedImage));
+//                                    GridPane.setRowIndex(circle,agent.getCurrentRow());
+//                                    GridPane.setColumnIndex(circle,agent.getCurrentCol());
+                                    System.out.println("Up");
+                                    if(agent.getCurrentRow()>0){
+                                        changePlayerPosition(agent.getCurrentCol(),agent.getCurrentRow()-1);
+                                    }
+                                    break;
+                                }
+                                break;
+                            }
+                            case S:  {
+                                System.out.println("down");
+                                if(agent.getCurrentRow()<9){
+                                    changePlayerPosition(agent.getCurrentCol(),agent.getCurrentRow()+1);
+                                }
+                                break;
+                            }
+                            case A:  {
+                                System.out.println("left");
+                                if(agent.getCurrentCol()>0){
+                                    changePlayerPosition(agent.getCurrentCol()-1,agent.getCurrentRow());
+                                }
+                                break;
+                            }
+                            case D: {
+                                System.out.println("right");
+                                if(agent.getCurrentCol()<9){
+                                    changePlayerPosition(agent.getCurrentCol()+1,agent.getCurrentRow());
+                                }
+                                break;
+                            }
+                        }
+                    }
+                });
+        stage.setScene(sc);
         stage.show();
     }
 
@@ -154,10 +235,10 @@ public class MainApplication extends Application {
     }
 
 
-    private void changePlayerPosition( int x, int y) {
+    public void changePlayerPosition( int x, int y) {
         agent.setCurrentCol(x);
         agent.setCurrentRow(y);
-        agent.base.visited[y][x] = true;
+        agent.base.visited[y][x] = 1;
         GridPane.setRowIndex(circle, y);
         GridPane.setColumnIndex(circle, x);
         agent.addKnowledgeFromPercept(world[y][x]);
@@ -167,15 +248,21 @@ public class MainApplication extends Application {
 
     private int pickMove(){
         int priority = -10;
-        int moveDir = 2;
+        int moveDir = ThreadLocalRandom.current().nextInt(4);
 
-//        if(agentPercept.getCurrCol() == 0 || agentPercept.getCurrCol()== 9) moveDir = 1;
-        if(agent.getCurrentRow() == 0 || agent.getCurrentRow()== 9) moveDir = 1;
-        if(agent.getCurrentCol() == 0 || agent.getCurrentCol()== 9) moveDir = 2;
-
-        if(world[agent.getCurrentCol()][agent.getCurrentRow()].equals("")) return moveDir;
-
-
+        //0 for back,1 right,2 front , 3 left
+        if(agent.getCurrentRow() == 0 || agent.getCurrentRow()== 9) {
+            if(agent.getCurrentCol() == 0) {
+                moveDir=1;
+            }else moveDir=3;
+        }
+        if(agent.getCurrentCol() == 0 || agent.getCurrentCol()== 9) {
+            if(agent.getCurrentRow() == 0){
+                moveDir = 2;
+            }else moveDir = 0;
+        }
+//this is my understanding so far
+//this is my understanding so far
 
         if(agent.getCurrentCol()-1>=0){
             int p = getPriority(agent.getCurrentCol()-1, agent.getCurrentRow());
@@ -219,43 +306,43 @@ public class MainApplication extends Application {
 //
     private int getPriority(int x, int y) {
 
+        int p= agent.base.visited[y][x]==1 ? 1 : 2 ;
         //check if visited
-        if(agent.base.visited[y][x]) return 1;
-//        if(propositionalLogicResolution.getResolutionResult("B"+y+x)) {
-//            System.out.println("Breeze at " + x + " " + y);
-//            if (propositionalLogicResolution.getResolutionResult("~P" + x + y)) {
-//                System.out.println("No Pit at " + x + " " + y);
-//                return 10;
-//
-//            } else {
-//                System.out.println("Pit at " + x + " " + y);
-//            }
-//        }
-//        if(propositionalLogicResolution.getResolutionResult("S"+x+y)) {
-//            System.out.println("Stench at " + x + " " + y);
-//
-//            if (propositionalLogicResolution.getResolutionResult("~W" + x + y)) {
-//                return 5;
-//            } else {
-//                System.out.println("WUMPUS at " + x + " " + y);
-//                if (propositionalLogicResolution.getResolutionResult("Gl" + x + y))
-//                    if (propositionalLogicResolution.getResolutionResult("G" + x + y)) {
-//                        System.out.println("GOLD at " + x + " " + y);
-//                        return 100;
-//                    } else
-//                        System.out.println("No GOLD at " + x + " " + y);
-//
-//            }
-//        }
-//        if(propositionalLogicResolution.getResolutionResult("Gl"+x+y)) {
-//            System.out.println("Glitter at " + x + " " + y);
-//
-//            if (propositionalLogicResolution.getResolutionResult("G" + x + y)) {
-//                System.out.println("GOLD at " + x + " " + y);
-//                return 100;
-//            } else
-//                System.out.println("No GOLD at " + x + " " + y);
-//        }
+        if(logic.getResolutionResult("B"+y+x)) {
+            System.out.println("Breeze at " + x + " " + y);
+            if (logic.getResolutionResult("~P" + x + y)) {
+                System.out.println("No Pit at " + x + " " + y);
+                return 10;
+
+            } else {
+                System.out.println("Pit at " + x + " " + y);
+            }
+        }
+        if(logic.getResolutionResult("S"+x+y)) {
+            System.out.println("Stench at " + x + " " + y);
+
+            if (logic.getResolutionResult("~W" + x + y)) {
+                return 5;
+            } else {
+                System.out.println("WUMPUS at " + x + " " + y);
+                if (logic.getResolutionResult("Gl" + x + y))
+                    if (logic.getResolutionResult("G" + x + y)) {
+                        System.out.println("GOLD at " + x + " " + y);
+                        return 100;
+                    } else
+                        System.out.println("No GOLD at " + x + " " + y);
+
+            }
+        }
+        if(logic.getResolutionResult("Gl"+x+y)) {
+            System.out.println("Glitter at " + x + " " + y);
+
+            if (logic.getResolutionResult("G" + x + y)) {
+                System.out.println("GOLD at " + x + " " + y);
+                return 100;
+            } else
+                System.out.println("No GOLD at " + x + " " + y);
+        }
 
 
 
