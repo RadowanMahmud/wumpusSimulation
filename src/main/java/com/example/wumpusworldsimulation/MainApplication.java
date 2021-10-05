@@ -7,6 +7,8 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -135,7 +137,7 @@ public class MainApplication extends Application {
         btn.setOnAction(e -> {
             changePlayerPosition(0, 0);
             agent.base.printKB();
-           startSimulation();
+          // startSimulation();
         });
 
         topBar.setRight(btn);
@@ -220,27 +222,27 @@ public class MainApplication extends Application {
         stage.show();
     }
 
-    private void startSimulation(){
-        new Thread(()->{ //use another thread so long process does not block gui
-            changePlayerPosition(agent.getCurrentCol(), agent.getCurrentRow());
-            while(true){
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }
-                int dir = pickMove();
-                if(dir == 0) changePlayerPosition(agent.getCurrentCol(), agent.getCurrentRow()-1);
-                else if(dir == 1) changePlayerPosition(agent.getCurrentCol()+1, agent.getCurrentRow());
-                else if(dir == 2) changePlayerPosition(agent.getCurrentCol(), agent.getCurrentRow()+1);
-                else if(dir == 3) changePlayerPosition(agent.getCurrentCol()-1, agent.getCurrentRow());
-                agent.base.printKB();
-
-            }
-
-        }).start();
-    }
-
+//    private void startSimulation(){
+//        new Thread(()->{ //use another thread so long process does not block gui
+//            changePlayerPosition(agent.getCurrentCol(), agent.getCurrentRow());
+//            while(true){
+//                try {
+//                    Thread.sleep(500);
+//                } catch (InterruptedException ex) {
+//                    ex.printStackTrace();
+//                }
+//                int dir = pickMove();
+//                if(dir == 0) changePlayerPosition(agent.getCurrentCol(), agent.getCurrentRow()-1);
+//                else if(dir == 1) changePlayerPosition(agent.getCurrentCol()+1, agent.getCurrentRow());
+//                else if(dir == 2) changePlayerPosition(agent.getCurrentCol(), agent.getCurrentRow()+1);
+//                else if(dir == 3) changePlayerPosition(agent.getCurrentCol()-1, agent.getCurrentRow());
+//                agent.base.printKB();
+//
+//            }
+//
+//        }).start();
+//    }
+//
 
     public void changePlayerPosition( int x, int y) {
         agent.setCurrentCol(x);
@@ -252,112 +254,125 @@ public class MainApplication extends Application {
         Rectangle c = (Rectangle) gp.lookup("#cover"+y+x);
         System.out.println(c);
         gp.getChildren().remove(c);
+        if(world[y][x].equals("wumpus")){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.getButtonTypes().remove(ButtonType.OK);
+            alert.getButtonTypes().add(ButtonType.CANCEL);
+            alert.setTitle("Wumpus");
+            alert.setContentText(String.format("Wumpus Has Attacked You"));
+            Optional<ButtonType> res = alert.showAndWait();
+
+            if(res.isPresent()) {
+                if(res.get().equals(ButtonType.CANCEL))
+                    System.exit(0);
+            }
+        }
     }
 
 
-    private int pickMove(){
-        int priority = -10;
-        int moveDir = ThreadLocalRandom.current().nextInt(4);
-
-        //0 for back,1 right,2 front , 3 left
-        if(agent.getCurrentRow() == 0 || agent.getCurrentRow()== 9) {
-            if(agent.getCurrentCol() == 0) {
-                moveDir=1;
-            }else moveDir=3;
-        }
-        if(agent.getCurrentCol() == 0 || agent.getCurrentCol()== 9) {
-            if(agent.getCurrentRow() == 0){
-                moveDir = 2;
-            }else moveDir = 0;
-        }
-//this is my understanding so far
-//this is my understanding so far
-
-        if(agent.getCurrentCol()-1>=0){
-            int p = getPriority(agent.getCurrentCol()-1, agent.getCurrentRow());
-            if(priority < p){
-                priority = p;
-                moveDir = 3;
-            }
-
-        }
-
-        if(agent.getCurrentCol()+1<10){
-            int p = getPriority(agent.getCurrentCol()+1, agent.getCurrentRow());
-            if(priority < p){
-                priority = p;
-                moveDir = 1;
-            }
-
-        }
-
-        if(agent.getCurrentRow()-1>=0){
-            int p = getPriority(agent.getCurrentCol(), agent.getCurrentRow()-1);
-            if(priority < p){
-                priority = p;
-                moveDir = 0;
-            }
-
-        }
-
-
-        if(agent.getCurrentRow()+1<10){
-            int p = getPriority(agent.getCurrentCol(), agent.getCurrentRow()+1);
-            if(priority < p){
-                priority = p;
-                moveDir = 2;
-            }
-
-        }
-
-        return moveDir;
-    }
+//    private int pickMove(){
+//        int priority = -10;
+//        int moveDir = ThreadLocalRandom.current().nextInt(4);
 //
-    private int getPriority(int x, int y) {
-
-        int p= agent.base.visited[y][x]==1 ? 1 : 2 ;
-        //check if visited
-        if(logic.getResolutionResult("B"+y+x)) {
-            System.out.println("Breeze at " + x + " " + y);
-            if (logic.getResolutionResult("~P" + x + y)) {
-                System.out.println("No Pit at " + x + " " + y);
-                return 10;
-
-            } else {
-                System.out.println("Pit at " + x + " " + y);
-            }
-        }
-        if(logic.getResolutionResult("S"+x+y)) {
-            System.out.println("Stench at " + x + " " + y);
-
-            if (logic.getResolutionResult("~W" + x + y)) {
-                return 5;
-            } else {
-                System.out.println("WUMPUS at " + x + " " + y);
-                if (logic.getResolutionResult("Gl" + x + y))
-                    if (logic.getResolutionResult("G" + x + y)) {
-                        System.out.println("GOLD at " + x + " " + y);
-                        return 100;
-                    } else
-                        System.out.println("No GOLD at " + x + " " + y);
-
-            }
-        }
-        if(logic.getResolutionResult("Gl"+x+y)) {
-            System.out.println("Glitter at " + x + " " + y);
-
-            if (logic.getResolutionResult("G" + x + y)) {
-                System.out.println("GOLD at " + x + " " + y);
-                return 100;
-            } else
-                System.out.println("No GOLD at " + x + " " + y);
-        }
-
-
-
-
-        return 3;
-    }
+//        //0 for back,1 right,2 front , 3 left
+//        if(agent.getCurrentRow() == 0 || agent.getCurrentRow()== 9) {
+//            if(agent.getCurrentCol() == 0) {
+//                moveDir=1;
+//            }else moveDir=3;
+//        }
+//        if(agent.getCurrentCol() == 0 || agent.getCurrentCol()== 9) {
+//            if(agent.getCurrentRow() == 0){
+//                moveDir = 2;
+//            }else moveDir = 0;
+//        }
+////this is my understanding so far
+////this is my understanding so far
+//
+//        if(agent.getCurrentCol()-1>=0){
+//            int p = getPriority(agent.getCurrentCol()-1, agent.getCurrentRow());
+//            if(priority < p){
+//                priority = p;
+//                moveDir = 3;
+//            }
+//
+//        }
+//
+//        if(agent.getCurrentCol()+1<10){
+//            int p = getPriority(agent.getCurrentCol()+1, agent.getCurrentRow());
+//            if(priority < p){
+//                priority = p;
+//                moveDir = 1;
+//            }
+//
+//        }
+//
+//        if(agent.getCurrentRow()-1>=0){
+//            int p = getPriority(agent.getCurrentCol(), agent.getCurrentRow()-1);
+//            if(priority < p){
+//                priority = p;
+//                moveDir = 0;
+//            }
+//
+//        }
+//
+//
+//        if(agent.getCurrentRow()+1<10){
+//            int p = getPriority(agent.getCurrentCol(), agent.getCurrentRow()+1);
+//            if(priority < p){
+//                priority = p;
+//                moveDir = 2;
+//            }
+//
+//        }
+//
+//        return moveDir;
+//    }
+////
+//    private int getPriority(int x, int y) {
+//
+//        int p= agent.base.visited[y][x]==1 ? 1 : 2 ;
+//        //check if visited
+//        if(logic.getResolutionResult("B"+y+x)) {
+//            System.out.println("Breeze at " + x + " " + y);
+//            if (logic.getResolutionResult("~P" + x + y)) {
+//                System.out.println("No Pit at " + x + " " + y);
+//                return 10;
+//
+//            } else {
+//                System.out.println("Pit at " + x + " " + y);
+//            }
+//        }
+//        if(logic.getResolutionResult("S"+x+y)) {
+//            System.out.println("Stench at " + x + " " + y);
+//
+//            if (logic.getResolutionResult("~W" + x + y)) {
+//                return 5;
+//            } else {
+//                System.out.println("WUMPUS at " + x + " " + y);
+//                if (logic.getResolutionResult("Gl" + x + y))
+//                    if (logic.getResolutionResult("G" + x + y)) {
+//                        System.out.println("GOLD at " + x + " " + y);
+//                        return 100;
+//                    } else
+//                        System.out.println("No GOLD at " + x + " " + y);
+//
+//            }
+//        }
+//        if(logic.getResolutionResult("Gl"+x+y)) {
+//            System.out.println("Glitter at " + x + " " + y);
+//
+//            if (logic.getResolutionResult("G" + x + y)) {
+//                System.out.println("GOLD at " + x + " " + y);
+//                return 100;
+//            } else
+//                System.out.println("No GOLD at " + x + " " + y);
+//        }
+//
+//
+//
+//
+//        return 3;
+//    }
 
     public static void main(String[] args) {
         launch();
