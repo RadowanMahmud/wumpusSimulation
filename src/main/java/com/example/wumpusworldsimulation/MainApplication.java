@@ -37,12 +37,9 @@ public class MainApplication extends Application {
     Agent agent = new Agent();
     LogicClass logic = new LogicClass(agent);
 
-
     @Override
     public void start(Stage stage) throws IOException {
 
-        Random rand = new Random();
-        //generating my world
         WumpusWorldGenerator generator= new WumpusWorldGenerator();
         world = generator.getGeneratedBoard();
 
@@ -55,7 +52,6 @@ public class MainApplication extends Application {
 
         for (int row = 0; row < 10; row++) {
             for (int col = 0; col < 10; col++) {
-
 
                 Rectangle rec = new Rectangle();
                 rec.setWidth(65);
@@ -115,6 +111,17 @@ public class MainApplication extends Application {
                     text.setVisible(true);
                     gp.getChildren().addAll(rec, text);
                 }
+                Rectangle coverRec= new Rectangle();
+                Image coverImage = new Image("grass.jpg",false);
+                coverRec.setHeight(65);
+                coverRec.setWidth(65);
+                coverRec.setFill(new ImagePattern(coverImage));
+                coverRec.setId("cover"+row+col);
+                //System.out.println("cover"+row+col);
+                GridPane.setRowIndex(coverRec, row);
+                GridPane.setColumnIndex(coverRec, col);
+                if(row == 0 && col ==0) continue;
+                gp.getChildren().add(coverRec);
             }
         }
 
@@ -241,8 +248,10 @@ public class MainApplication extends Application {
         agent.base.visited[y][x] = 1;
         GridPane.setRowIndex(circle, y);
         GridPane.setColumnIndex(circle, x);
-        agent.addKnowledgeFromPercept(world[y][x]);
-
+        // agent.addKnowledgeFromPercept(world[y][x]);
+        Rectangle c = (Rectangle) gp.lookup("#cover"+y+x);
+        System.out.println(c);
+        gp.getChildren().remove(c);
     }
 
 
