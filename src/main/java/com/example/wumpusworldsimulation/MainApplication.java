@@ -269,7 +269,8 @@ public class MainApplication extends Application {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.getButtonTypes().remove(ButtonType.OK);
             alert.getButtonTypes().add(ButtonType.CANCEL);
-            alert.setTitle("Wumpus");
+            alert.setTitle("Game Over");
+            alert.setHeaderText("WUMPUS!!!!!!");
             alert.setContentText(String.format("Wumpus Has Attacked You"));
             Optional<ButtonType> res = alert.showAndWait();
 
@@ -282,7 +283,8 @@ public class MainApplication extends Application {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.getButtonTypes().remove(ButtonType.OK);
             alert.getButtonTypes().add(ButtonType.CANCEL);
-            alert.setTitle("Pit");
+            alert.setTitle("GameOver");
+            alert.setHeaderText("Pit!!!!!!");
             alert.setContentText(String.format("You fell in a pit"));
             Optional<ButtonType> res = alert.showAndWait();
 
@@ -295,7 +297,8 @@ public class MainApplication extends Application {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.getButtonTypes().remove(ButtonType.OK);
             alert.getButtonTypes().add(ButtonType.CANCEL);
-            alert.setTitle("GOLD$$$$$$$$$$$$$$$");
+            alert.setTitle("VIctory");
+            alert.setHeaderText("Gold$$$$");
             alert.setContentText(String.format("Congratulations, You won"));
             Optional<ButtonType> res = alert.showAndWait();
             if(res.isPresent()) {
