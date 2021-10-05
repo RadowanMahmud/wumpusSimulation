@@ -161,11 +161,11 @@ public class MainApplication extends Application {
         //circle.setFill(Color.valueOf("Red"));
         Image im = new Image("wumpus.png",false);
         circle.setFill(new ImagePattern(im));
-        circle.setRadius(30);
+        circle.setRadius(20);
         GridPane.setRowIndex(circle,agent.getCurrentRow());
         GridPane.setColumnIndex(circle,agent.getCurrentCol());
         gp.getChildren().add(circle);
-        //GridPane.setMargin(circle, new Insets(0,0,0,0));
+        GridPane.setMargin(circle, new Insets(0,0,0,10));
         vbox.getChildren().add(gp);
         root.setLeft(vbox);
         stage.setTitle("Wumpus World!");
@@ -255,13 +255,38 @@ public class MainApplication extends Application {
         System.out.println(c);
         gp.getChildren().remove(c);
         if(world[y][x].equals("wumpus")){
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.getButtonTypes().remove(ButtonType.OK);
             alert.getButtonTypes().add(ButtonType.CANCEL);
             alert.setTitle("Wumpus");
             alert.setContentText(String.format("Wumpus Has Attacked You"));
             Optional<ButtonType> res = alert.showAndWait();
 
+            if(res.isPresent()) {
+                if(res.get().equals(ButtonType.CANCEL))
+                    System.exit(0);
+            }
+        }
+        else if(world[y][x].equals("pit")){
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.getButtonTypes().remove(ButtonType.OK);
+            alert.getButtonTypes().add(ButtonType.CANCEL);
+            alert.setTitle("Pit");
+            alert.setContentText(String.format("You fell in a pit"));
+            Optional<ButtonType> res = alert.showAndWait();
+
+            if(res.isPresent()) {
+                if(res.get().equals(ButtonType.CANCEL))
+                    System.exit(0);
+            }
+        }
+        else if(world[y][x].equals("gold")){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.getButtonTypes().remove(ButtonType.OK);
+            alert.getButtonTypes().add(ButtonType.CANCEL);
+            alert.setTitle("GOLD$$$$$$$$$$$$$$$");
+            alert.setContentText(String.format("Congratulations, You won"));
+            Optional<ButtonType> res = alert.showAndWait();
             if(res.isPresent()) {
                 if(res.get().equals(ButtonType.CANCEL))
                     System.exit(0);
