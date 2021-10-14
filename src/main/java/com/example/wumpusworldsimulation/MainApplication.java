@@ -4,6 +4,7 @@ import com.example.wumpusworldsimulation.Board.Agent;
 import com.example.wumpusworldsimulation.Board.LogicClass;
 import com.example.wumpusworldsimulation.Board.WumpusWorldGenerator;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
@@ -38,6 +39,8 @@ public class MainApplication extends Application {
 //    AgentPercept agentPercept = new AgentPercept();
     Agent agent = new Agent();
     LogicClass logic = new LogicClass(agent);
+    Thread simulate;
+    boolean simulation_started= false;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -137,7 +140,9 @@ public class MainApplication extends Application {
         btn.setOnAction(e -> {
             changePlayerPosition(0, 0);
             agent.base.printKB();
-          // startSimulation();
+            startAiSimulation();
+
+            // startSimulation();
         });
 
         topBar.setRight(btn);
@@ -199,7 +204,7 @@ public class MainApplication extends Application {
 //                                    GridPane.setColumnIndex(circle,agent.getCurrentCol());
                                     System.out.println("Up");
                                     if(agent.getCurrentRow()>0){
-                                        changePlayerPosition(agent.getCurrentCol(),agent.getCurrentRow()-1);
+                                        changePlayerPosition(agent.getCurrentRow()-1, agent.getCurrentCol());
                                     }
                                     break;
                                 }
@@ -208,23 +213,27 @@ public class MainApplication extends Application {
                             case S:  {
                                 System.out.println("down");
                                 if(agent.getCurrentRow()<9){
-                                    changePlayerPosition(agent.getCurrentCol(),agent.getCurrentRow()+1);
+                                    changePlayerPosition(agent.getCurrentRow()+1, agent.getCurrentCol());
                                 }
                                 break;
                             }
                             case A:  {
                                 System.out.println("left");
                                 if(agent.getCurrentCol()>0){
-                                    changePlayerPosition(agent.getCurrentCol()-1,agent.getCurrentRow());
+                                    changePlayerPosition(agent.getCurrentRow(),agent.getCurrentCol()-1);
                                 }
                                 break;
                             }
                             case D: {
                                 System.out.println("right");
                                 if(agent.getCurrentCol()<9){
-                                    changePlayerPosition(agent.getCurrentCol()+1,agent.getCurrentRow());
+                                    changePlayerPosition(agent.getCurrentRow(), agent.getCurrentCol()+1);
                                 }
                                 break;
+                            }
+                            case F10: {
+                                System.out.println("F10 pressed");
+                                removeCover();
                             }
                         }
                     }
@@ -254,56 +263,138 @@ public class MainApplication extends Application {
 //        }).start();
 //    }
 //
+    public void startAiSimulation(){
+        simulate = new Thread(()->{
+            changePlayerPosition(agent.getCurrentCol(), agent.getCurrentRow());
+            while(true){
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+                // int dir = pickMove();
+                String direction="right";
+                if(direction.equals("up")) changePlayerPosition( agent.getCurrentRow()-1, agent.getCurrentCol());
+                else if(direction.equals("right")) changePlayerPosition( agent.getCurrentRow(),agent.getCurrentCol()+1);
+                else if(direction.equals("down")) changePlayerPosition(agent.getCurrentRow()+1,agent.getCurrentCol());
+                else if(direction.equals("left")) changePlayerPosition( agent.getCurrentRow(),agent.getCurrentCol()-1);
+                agent.base.printKB();
+            }
+        });
+        simulate.start();
+    }
 
-    public void changePlayerPosition( int x, int y) {
-        agent.setCurrentCol(x);
-        agent.setCurrentRow(y);
-        agent.base.visited[y][x] = 1;
-        GridPane.setRowIndex(circle, y);
-        GridPane.setColumnIndex(circle, x);
+    public void changePlayerPosition( int row ,int col)
+    {
+        agent.setCurrentCol(col);
+        agent.setCurrentRow(row);
+        agent.base.visited[row][col] = 1;
+        GridPane.setRowIndex(circle, row);
+        GridPane.setColumnIndex(circle, col);
         // agent.addKnowledgeFromPercept(world[y][x]);
-        Rectangle c = (Rectangle) gp.lookup("#cover"+y+x);
+        Rectangle c = (Rectangle) gp.lookup("#cover"+row+col);
         System.out.println(c);
-        gp.getChildren().remove(c);
-        if(world[y][x].equals("wumpus")){
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.getButtonTypes().remove(ButtonType.OK);
-            alert.getButtonTypes().add(ButtonType.CANCEL);
-            alert.setTitle("Game Over");
-            alert.setHeaderText("WUMPUS!!!!!!");
-            alert.setContentText(String.format("Wumpus Has Attacked You"));
-            Optional<ButtonType> res = alert.showAndWait();
+        try {
+            Platform.runLater(new Runnable(){
+                @Override
+                public void run() {
+                    gp.getChildren().remove(c);
+                }
+            });
+            if(simulation_started){
+                simulate.join();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if(world[row][col].equals("wumpus")){
+                Platform.runLater(new Runnable(){
+                    @Override
+                    public void run() {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.getButtonTypes().remove(ButtonType.OK);
+                        alert.getButtonTypes().add(ButtonType.CANCEL);
+                        alert.setTitle("Game Over");
+                        alert.setHeaderText("WUMPUS!!!!!!");
+                        alert.setContentText(String.format("Wumpus Has Attacked You"));
+                        Optional<ButtonType> res = alert.showAndWait();
 
-            if(res.isPresent()) {
-                if(res.get().equals(ButtonType.CANCEL))
-                    System.exit(0);
+                        if(res.isPresent()) {
+                            if(res.get().equals(ButtonType.CANCEL))
+                                System.exit(0);
+                        }
+                    }
+                });
+                if(simulation_started){
+                    try {
+                        simulate.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+        }
+        else if(world[row][col].equals("pit")){
+            Platform.runLater(new Runnable(){
+                @Override
+                public void run() {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.getButtonTypes().remove(ButtonType.OK);
+                    alert.getButtonTypes().add(ButtonType.CANCEL);
+                    alert.setTitle("GameOver");
+                    alert.setHeaderText("Pit!!!!!!");
+                    alert.setContentText(String.format("You fell in a pit"));
+                    Optional<ButtonType> res = alert.showAndWait();
+
+                    if(res.isPresent()) {
+                        if(res.get().equals(ButtonType.CANCEL))
+                            System.exit(0);
+                    }
+                }
+            });
+            if(simulation_started){
+                try {
+                    simulate.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
-        else if(world[y][x].equals("pit")){
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.getButtonTypes().remove(ButtonType.OK);
-            alert.getButtonTypes().add(ButtonType.CANCEL);
-            alert.setTitle("GameOver");
-            alert.setHeaderText("Pit!!!!!!");
-            alert.setContentText(String.format("You fell in a pit"));
-            Optional<ButtonType> res = alert.showAndWait();
-
-            if(res.isPresent()) {
-                if(res.get().equals(ButtonType.CANCEL))
-                    System.exit(0);
+        else if(world[row][col].equals("gold")){
+            Platform.runLater(new Runnable(){
+                @Override
+                public void run() {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.getButtonTypes().remove(ButtonType.OK);
+                    alert.getButtonTypes().add(ButtonType.CANCEL);
+                    alert.setTitle("VIctory");
+                    alert.setHeaderText("Gold$$$$");
+                    alert.setContentText(String.format("Congratulations, You won"));
+                    Optional<ButtonType> res = alert.showAndWait();
+                    if(res.isPresent()) {
+                        if(res.get().equals(ButtonType.CANCEL))
+                            System.exit(0);
+                    }
+                }
+            });
+            if(simulation_started){
+                try {
+                    simulate.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
-        else if(world[y][x].equals("gold")){
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.getButtonTypes().remove(ButtonType.OK);
-            alert.getButtonTypes().add(ButtonType.CANCEL);
-            alert.setTitle("VIctory");
-            alert.setHeaderText("Gold$$$$");
-            alert.setContentText(String.format("Congratulations, You won"));
-            Optional<ButtonType> res = alert.showAndWait();
-            if(res.isPresent()) {
-                if(res.get().equals(ButtonType.CANCEL))
-                    System.exit(0);
+    }
+
+    public void removeCover(){
+        for(int i=0;i<10;i++){
+            for(int j=0;j<10;j++){
+                if(i == 0 && j == 0) continue;
+                else{
+                    Rectangle c = (Rectangle) gp.lookup("#cover"+i+j);
+                    gp.getChildren().remove(c);
+                }
             }
         }
     }

@@ -50,8 +50,8 @@ public class WumpusWorldGenerator {
         int rany = raandom.nextInt(9+1);
         if(checkBlock(ranx,rany)){
             board[ranx][rany]="pit";
+            setEnvironment(ranx,rany,"breeze");
         }
-        setEnvironment(ranx,rany,"breeze");
     }
 
     public boolean checkBlock(int i,int j){
