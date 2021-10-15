@@ -10,14 +10,20 @@ public class MyAi {
     public Map<String,Integer> myMoves=new HashMap<String,Integer>();
     String realWorld[][];
     public MyAi(MyKnowledgeBase knowledgeBase,Agent agent, int size, String[][] world){
-        myMoves.put("up",0);
-        myMoves.put("right",0);
-        myMoves.put("down",0);
-        myMoves.put("left",0);
+        setBasicMap();
+
+
         this.knowledgeBase = knowledgeBase;
         this.agent = agent;
         this.size = size;
         this.realWorld = world;
+    }
+
+    public void setBasicMap(){
+        myMoves.put("up",0);
+        myMoves.put("right",0);
+        myMoves.put("down",0);
+        myMoves.put("left",0);
     }
 
     public String whereSHouldIgo(){
