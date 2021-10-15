@@ -41,6 +41,7 @@ public class MainApplication extends Application {
     LogicClass logic = new LogicClass(agent);
     Thread simulate;
     boolean simulation_started= false;
+    boolean gameLoop=true;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -138,6 +139,12 @@ public class MainApplication extends Application {
 
         Button btn = new Button("Simulate");
         btn.setOnAction(e -> {
+            Image im = new Image("front_face.png",false);
+            circle.setFill(new ImagePattern(im));
+            circle.setRadius(15);
+            GridPane.setRowIndex(circle,agent.getCurrentRow());
+            GridPane.setColumnIndex(circle,agent.getCurrentCol());
+            agent.setCurrentDirection("down");
             changePlayerPosition(0, 0);
             agent.base.printKB();
             startAiSimulation();
@@ -268,8 +275,9 @@ public class MainApplication extends Application {
     }
 
     public void startAiSimulation(){
+        simulation_started = true;
         simulate = new Thread(()->{
-            while(true){
+            while(gameLoop){
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
@@ -304,10 +312,10 @@ public class MainApplication extends Application {
                     gp.getChildren().remove(c);
                 }
             });
-            if(simulation_started){
-                simulate.join();
-            }
-        } catch (InterruptedException e) {
+//            if(simulation_started){
+//                simulate.join();
+//            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
         if(world[row][col].equals("wumpus")){
@@ -330,6 +338,7 @@ public class MainApplication extends Application {
                 });
                 if(simulation_started){
                     try {
+                        System.out.println("we are calling");
                         simulate.join();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -357,6 +366,7 @@ public class MainApplication extends Application {
             });
             if(simulation_started){
                 try {
+                    System.out.println("we are calling");
                     simulate.join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -382,6 +392,7 @@ public class MainApplication extends Application {
             });
             if(simulation_started){
                 try {
+                    System.out.println("we are calling");
                     simulate.join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
