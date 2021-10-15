@@ -175,13 +175,14 @@ public class MainApplication extends Application {
 
 
         //circle.setFill(Color.valueOf("Red"));
-        Image im = new Image("wumpus.png",false);
+        agent.setCurrentDirection("down");
+        Image im = new Image("front_face.png",false);
         circle.setFill(new ImagePattern(im));
-        circle.setRadius(20);
+        circle.setRadius(15);
         GridPane.setRowIndex(circle,agent.getCurrentRow());
         GridPane.setColumnIndex(circle,agent.getCurrentCol());
         gp.getChildren().add(circle);
-        GridPane.setMargin(circle, new Insets(0,0,0,10));
+        GridPane.setMargin(circle, new Insets(0,0,0,17));
         vbox.getChildren().add(gp);
         root.setLeft(vbox);
         stage.setTitle("Wumpus World!");
@@ -193,18 +194,15 @@ public class MainApplication extends Application {
                             case W:  {
                                 System.out.println("up");
                                 if(agent.getCurrentRow()>0){
-                                    //code for image rotation
-//                                    ImageView iv = new ImageView(im);
-//                                    iv.setRotate(270);
-//                                    SnapshotParameters params = new SnapshotParameters();
-//                                    params.setFill(Color.TRANSPARENT);
-//                                    Image rotatedImage = iv.snapshot(params, null);
-//                                    circle.setFill(new ImagePattern(rotatedImage));
-//                                    GridPane.setRowIndex(circle,agent.getCurrentRow());
-//                                    GridPane.setColumnIndex(circle,agent.getCurrentCol());
-                                    System.out.println("Up");
-                                    if(agent.getCurrentRow()>0){
+                                    if(agent.getCurrentDirection().equals("up")){
                                         changePlayerPosition(agent.getCurrentRow()-1, agent.getCurrentCol());
+                                    }else{
+                                        Image im = new Image("back.png",false);
+                                        circle.setFill(new ImagePattern(im));
+                                        circle.setRadius(15);
+                                        GridPane.setRowIndex(circle,agent.getCurrentRow());
+                                        GridPane.setColumnIndex(circle,agent.getCurrentCol());
+                                        agent.setCurrentDirection("up");
                                     }
                                     break;
                                 }
@@ -213,21 +211,48 @@ public class MainApplication extends Application {
                             case S:  {
                                 System.out.println("down");
                                 if(agent.getCurrentRow()<9){
-                                    changePlayerPosition(agent.getCurrentRow()+1, agent.getCurrentCol());
+                                    if(agent.getCurrentDirection().equals("down")){
+                                        changePlayerPosition(agent.getCurrentRow()+1, agent.getCurrentCol());
+                                    }else{
+                                        Image im = new Image("front_face.png",false);
+                                        circle.setFill(new ImagePattern(im));
+                                        circle.setRadius(15);
+                                        GridPane.setRowIndex(circle,agent.getCurrentRow());
+                                        GridPane.setColumnIndex(circle,agent.getCurrentCol());
+                                        agent.setCurrentDirection("down");
+                                    }
                                 }
                                 break;
                             }
                             case A:  {
                                 System.out.println("left");
                                 if(agent.getCurrentCol()>0){
-                                    changePlayerPosition(agent.getCurrentRow(),agent.getCurrentCol()-1);
+                                    if(agent.getCurrentDirection().equals("left")){
+                                        changePlayerPosition(agent.getCurrentRow(),agent.getCurrentCol()-1);
+                                    }else{
+                                        Image im = new Image("left_face.png",false);
+                                        circle.setFill(new ImagePattern(im));
+                                        circle.setRadius(15);
+                                        GridPane.setRowIndex(circle,agent.getCurrentRow());
+                                        GridPane.setColumnIndex(circle,agent.getCurrentCol());
+                                        agent.setCurrentDirection("left");
+                                    }
                                 }
                                 break;
                             }
                             case D: {
                                 System.out.println("right");
                                 if(agent.getCurrentCol()<9){
-                                    changePlayerPosition(agent.getCurrentRow(), agent.getCurrentCol()+1);
+                                    if(agent.getCurrentDirection().equals("right")){
+                                        changePlayerPosition(agent.getCurrentRow(), agent.getCurrentCol()+1);
+                                    }else{
+                                        Image im = new Image("right_face.png",false);
+                                        circle.setFill(new ImagePattern(im));
+                                        circle.setRadius(15);
+                                        GridPane.setRowIndex(circle,agent.getCurrentRow());
+                                        GridPane.setColumnIndex(circle,agent.getCurrentCol());
+                                        agent.setCurrentDirection("right");
+                                    }
                                 }
                                 break;
                             }
@@ -242,30 +267,8 @@ public class MainApplication extends Application {
         stage.show();
     }
 
-//    private void startSimulation(){
-//        new Thread(()->{ //use another thread so long process does not block gui
-//            changePlayerPosition(agent.getCurrentCol(), agent.getCurrentRow());
-//            while(true){
-//                try {
-//                    Thread.sleep(500);
-//                } catch (InterruptedException ex) {
-//                    ex.printStackTrace();
-//                }
-//                int dir = pickMove();
-//                if(dir == 0) changePlayerPosition(agent.getCurrentCol(), agent.getCurrentRow()-1);
-//                else if(dir == 1) changePlayerPosition(agent.getCurrentCol()+1, agent.getCurrentRow());
-//                else if(dir == 2) changePlayerPosition(agent.getCurrentCol(), agent.getCurrentRow()+1);
-//                else if(dir == 3) changePlayerPosition(agent.getCurrentCol()-1, agent.getCurrentRow());
-//                agent.base.printKB();
-//
-//            }
-//
-//        }).start();
-//    }
-//
     public void startAiSimulation(){
         simulate = new Thread(()->{
-            changePlayerPosition(agent.getCurrentCol(), agent.getCurrentRow());
             while(true){
                 try {
                     Thread.sleep(500);
@@ -273,7 +276,7 @@ public class MainApplication extends Application {
                     ex.printStackTrace();
                 }
                 // int dir = pickMove();
-                String direction="right";
+                String direction=getMove();
                 if(direction.equals("up")) changePlayerPosition( agent.getCurrentRow()-1, agent.getCurrentCol());
                 else if(direction.equals("right")) changePlayerPosition( agent.getCurrentRow(),agent.getCurrentCol()+1);
                 else if(direction.equals("down")) changePlayerPosition(agent.getCurrentRow()+1,agent.getCurrentCol());
@@ -399,6 +402,13 @@ public class MainApplication extends Application {
         }
     }
 
+    public String getMove(){
+        if(agent.getCurrentCol() == 9){
+            return "down";
+        }else if(agent.getCurrentCol() == 0){
+            return "right";
+        } else return "right";
+    }
 
 //    private int pickMove(){
 //        int priority = -10;

@@ -6,6 +6,7 @@ import java.util.Arrays;
 public class Agent {
     private int currentRow= 0;
     private int currentCol= 0;
+    private String currentDirection = "down";
     public static KnowledgeBase base = null;
     public Agent(){
         base = new KnowledgeBase();
@@ -67,5 +68,13 @@ public class Agent {
 
     public void setCurrentRow(int currentRow) {
         this.currentRow = currentRow;
+    }
+
+    public String getCurrentDirection() {
+        return currentDirection;
+    }
+
+    public void setCurrentDirection(String currentDirection) {
+        this.currentDirection = currentDirection;
     }
 }
