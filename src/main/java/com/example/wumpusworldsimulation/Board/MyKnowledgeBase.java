@@ -7,9 +7,11 @@ public class MyKnowledgeBase {
     public MyKnowledgeBase(){
         for(int i=0;i<10;i++){
             for(int j=0;j<10;j++){
-                base[i][j]=" ";
+                base[i][j]="#";
                 cost[i][j]=0;
             }
         }
+        cost[0][0]=1;
+        base[0][0] = " ";
     }
 }

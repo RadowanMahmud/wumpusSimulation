@@ -271,7 +271,7 @@ public class MainApplication extends Application {
         simulate = new Thread(()->{
             while(gameLoop){
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(2000);
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
@@ -321,8 +321,8 @@ public class MainApplication extends Application {
                         Optional<ButtonType> res = alert.showAndWait();
 
                         if(res.isPresent()) {
-                            if(res.get().equals(ButtonType.CANCEL))
-                                System.exit(0);
+                            if(res.get().equals(ButtonType.CANCEL));
+                               // System.exit(0);
                         }
                     }
                 });
@@ -348,8 +348,8 @@ public class MainApplication extends Application {
                     Optional<ButtonType> res = alert.showAndWait();
 
                     if(res.isPresent()) {
-                        if(res.get().equals(ButtonType.CANCEL))
-                            System.exit(0);
+                        if(res.get().equals(ButtonType.CANCEL));
+                           // System.exit(0);
                     }
                 }
             });
@@ -373,8 +373,8 @@ public class MainApplication extends Application {
                     alert.setContentText(String.format("Congratulations, You won"));
                     Optional<ButtonType> res = alert.showAndWait();
                     if(res.isPresent()) {
-                        if(res.get().equals(ButtonType.CANCEL))
-                            System.exit(0);
+                        if(res.get().equals(ButtonType.CANCEL));
+                           // System.exit(0);
                     }
                 }
             });
@@ -382,7 +382,7 @@ public class MainApplication extends Application {
                 try {
                     simulate.join();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                   // e.printStackTrace();
                 }
             }
         }

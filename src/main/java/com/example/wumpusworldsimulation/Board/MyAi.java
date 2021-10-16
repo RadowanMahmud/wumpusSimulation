@@ -24,6 +24,10 @@ public class MyAi {
         myMoves.put("left",0);
     }
 
+    public void GoldDetection(){
+
+    }
+
     public String whereSHouldIgo(){
         myAvailableMoves();
         mySafeMoves();
@@ -43,6 +47,9 @@ public class MyAi {
     public void updateBase(int row,int col){
         this.knowledgeBase.cost[row][col]++;
         this.knowledgeBase.base[row][col] = this.realWorld[row][col];
+        System.out.println(row +" "+ col);
+        System.out.println(knowledgeBase.base[row][col]);
+        System.out.println(knowledgeBase.cost[row][col]);
     }
 
     public String finalMove(){
@@ -60,22 +67,26 @@ public class MyAi {
     }
     public boolean canImakeThisMove(int row,int col){
         if(isItLegalToUseTheBox(row,col+1)){
-            if(!this.knowledgeBase.base[row][col+1].contains("breeze") && !this.knowledgeBase.base[row][col+1].contains("pit")){
+            if(!this.knowledgeBase.base[row][col+1].equals("#") && !this.knowledgeBase.base[row][col+1].contains("breeze")
+                    && !this.knowledgeBase.base[row][col+1].contains("stench")){
                 return true;
             }
         }
-        else if(isItLegalToUseTheBox(row+1,col)){
-            if(!this.knowledgeBase.base[row+1][col].contains("breeze") && !this.knowledgeBase.base[row+1][col].contains("pit")){
+        if(isItLegalToUseTheBox(row+1,col)){
+            if(!this.knowledgeBase.base[row+1][col].equals("#") && !this.knowledgeBase.base[row+1][col].contains("breeze")
+                    && !this.knowledgeBase.base[row+1][col].contains("stench")){
                 return true;
             }
         }
-        else if(isItLegalToUseTheBox(row-1,col)){
-            if(!this.knowledgeBase.base[row-1][col].contains("breeze") && !this.knowledgeBase.base[row-1][col].contains("pit")){
+        if(isItLegalToUseTheBox(row-1,col)){
+            if(!this.knowledgeBase.base[row-1][col].equals("#") && !this.knowledgeBase.base[row-1][col].contains("breeze")
+                    && !this.knowledgeBase.base[row-1][col].contains("stench")){
                 return true;
             }
         }
-        else if(isItLegalToUseTheBox(row,col-1)){
-            if(!this.knowledgeBase.base[row][col-1].contains("breeze") && !this.knowledgeBase.base[row][col-1].contains("pit")){
+        if(isItLegalToUseTheBox(row,col-1)){
+            if(!this.knowledgeBase.base[row][col-1].equals("#") && !this.knowledgeBase.base[row][col-1].contains("breeze")
+                    && !this.knowledgeBase.base[row][col-1].contains("stench")){
                 return true;
             }
         }
@@ -136,7 +147,5 @@ public class MyAi {
         if(agent.getCurrentCol() == size-1){
             myMoves.put("right",-1);
         }
-        System.out.println(myMoves );
-        System.out.println(agent.getCurrentRow() +" "+ agent.getCurrentCol());
     }
 }
