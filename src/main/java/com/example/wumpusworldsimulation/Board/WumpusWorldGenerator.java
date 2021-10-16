@@ -14,7 +14,6 @@ public class WumpusWorldGenerator {
         for(int i=0;i<pitNumber;i++){
             placePitsOnBoard();
         }
-        print();
         return board;
     }
     public void prepareBoard(){
