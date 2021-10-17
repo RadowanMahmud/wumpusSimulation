@@ -34,6 +34,7 @@ public class MainApplication extends Application {
     Agent agent = new Agent();
     MyKnowledgeBase base = new MyKnowledgeBase();
     MyAi ai;
+    MyAiNextLevel aiNextLevel;
     Thread simulate;
     boolean simulation_started= false;
     boolean gameLoop=true;
@@ -271,7 +272,7 @@ public class MainApplication extends Application {
         simulate = new Thread(()->{
             while(gameLoop){
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(500);
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
@@ -290,7 +291,6 @@ public class MainApplication extends Application {
     {
         agent.setCurrentCol(col);
         agent.setCurrentRow(row);
-        agent.base.visited[row][col] = 1;
         GridPane.setRowIndex(circle, row);
         GridPane.setColumnIndex(circle, col);
         // agent.addKnowledgeFromPercept(world[y][x]);

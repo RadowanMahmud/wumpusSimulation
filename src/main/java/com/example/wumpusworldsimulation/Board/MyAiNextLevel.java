@@ -3,14 +3,15 @@ package com.example.wumpusworldsimulation.Board;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MyAi {
+public class MyAiNextLevel {
     public MyKnowledgeBase knowledgeBase;
     public Agent agent;
     public int size;
     public Map<String,Integer> myMoves=new HashMap<String,Integer>();
     public DeadLoack deadLoack = new DeadLoack();
     String realWorld[][];
-    public MyAi(MyKnowledgeBase knowledgeBase,Agent agent, int size, String[][] world){
+
+    public MyAiNextLevel(MyKnowledgeBase knowledgeBase,Agent agent, int size, String[][] world){
         setBasicMap();
         this.knowledgeBase = knowledgeBase;
         this.agent = agent;
@@ -30,15 +31,6 @@ public class MyAi {
         if(this.realWorld[agent.getCurrentRow()][agent.getCurrentCol()].contains("glitter")){
             return glitterFound();
         }
-//        if(this.realWorld[agent.getCurrentRow()][agent.getCurrentCol()].contains("breeze")){
-//            System.out.println("breeze deadlock check"+agent.getCurrentRow()+agent.getCurrentCol());
-//            deadLoack.setMyBase(this.knowledgeBase.base);
-//            if(deadLoack.isItDeadLock(agent.getCurrentRow(), agent.getCurrentCol())){
-//                System.out.println("Its a dead lock");
-//                return "dead";
-//            }
-//            return normalMove();
-//        }
         else return normalMove();
     }
     public String glitterFound(){
@@ -92,28 +84,62 @@ public class MyAi {
         }
         return normalMove();
     }
+
     public String normalMove(){
         myAvailableMoves();
         mySafeMoves();
         String finalMove = finalMove();
         if(finalMove.equals("up")){
             updateBase(agent.getCurrentRow()-1, agent.getCurrentCol());
+            updateCostUponFInalMove(agent.getCurrentRow()-1, agent.getCurrentCol());
         }else if(finalMove.equals("right")){
             updateBase(agent.getCurrentRow(), agent.getCurrentCol()+1);
+            updateCostUponFInalMove(agent.getCurrentRow(), agent.getCurrentCol()+1);
         }else if(finalMove.equals("down")){
             updateBase(agent.getCurrentRow()+1, agent.getCurrentCol());
+            updateCostUponFInalMove(agent.getCurrentRow()+1, agent.getCurrentCol());
         }else if(finalMove.equals("left")){
             updateBase(agent.getCurrentRow(), agent.getCurrentCol()-1);
+            updateCostUponFInalMove(agent.getCurrentRow(), agent.getCurrentCol()-1);
         }
         setBasicMap();
         return finalMove;
     }
+
+    public void updateCostUponFInalMove(int row,int col){
+        if(isItLegalToUseTheBox(row-1,col)){
+            if(this.knowledgeBase.base[row][col].contains("breeze") || this.knowledgeBase.base[row][col].contains("stench")){
+                if(this.knowledgeBase.base[row-1][col].equals("#")){
+                    this.knowledgeBase.cost[row-1][col] += 2;
+                }
+            }
+        }
+        if(isItLegalToUseTheBox(row,col+1)){
+            if(this.knowledgeBase.base[row][col].contains("breeze") || this.knowledgeBase.base[row][col].contains("stench")){
+                if(this.knowledgeBase.base[row][col+1].equals("#")){
+                    this.knowledgeBase.cost[row][col+1] += 2;
+                }
+            }
+        }
+        if(isItLegalToUseTheBox(row+1,col)){
+            if(this.knowledgeBase.base[row][col].contains("breeze") || this.knowledgeBase.base[row][col].contains("stench")){
+                if(this.knowledgeBase.base[row+1][col].equals("#")){
+                    this.knowledgeBase.cost[row+1][col] += 2;
+                }
+            }
+        }
+        if (isItLegalToUseTheBox(row, col-1)){
+            if(this.knowledgeBase.base[row][col].contains("breeze") || this.knowledgeBase.base[row][col].contains("stench")){
+                if(this.knowledgeBase.base[row][col-1].equals("#")){
+                    this.knowledgeBase.cost[row][col-1] += 2;
+                }
+            }
+        }
+    }
+
     public void updateBase(int row,int col){
-        this.knowledgeBase.cost[row][col]++;
+        this.knowledgeBase.cost[row][col]+=3;
         this.knowledgeBase.base[row][col] = this.realWorld[row][col];
-//        System.out.println(row +" "+ col);
-//        System.out.println(knowledgeBase.base[row][col]);
-//        System.out.println(knowledgeBase.cost[row][col]);
     }
 
     public String finalMove(){
@@ -129,33 +155,6 @@ public class MyAi {
         }
         return move;
     }
-    public boolean canImakeThisMove(int row,int col){
-        if(isItLegalToUseTheBox(row,col+1)){
-            if(!this.knowledgeBase.base[row][col+1].equals("#") && !this.knowledgeBase.base[row][col+1].contains("breeze")
-                    && !this.knowledgeBase.base[row][col+1].contains("stench")){
-                return true;
-            }
-        }
-        if(isItLegalToUseTheBox(row+1,col)){
-            if(!this.knowledgeBase.base[row+1][col].equals("#") && !this.knowledgeBase.base[row+1][col].contains("breeze")
-                    && !this.knowledgeBase.base[row+1][col].contains("stench")){
-                return true;
-            }
-        }
-        if(isItLegalToUseTheBox(row-1,col)){
-            if(!this.knowledgeBase.base[row-1][col].equals("#") && !this.knowledgeBase.base[row-1][col].contains("breeze")
-                    && !this.knowledgeBase.base[row-1][col].contains("stench")){
-                return true;
-            }
-        }
-        if(isItLegalToUseTheBox(row,col-1)){
-            if(!this.knowledgeBase.base[row][col-1].equals("#") && !this.knowledgeBase.base[row][col-1].contains("breeze")
-                    && !this.knowledgeBase.base[row][col-1].contains("stench")){
-                return true;
-            }
-        }
-        return false;
-    }
 
     public boolean isItLegalToUseTheBox(int row , int col){
         if(row<0 || row>size-1 || col<0 || col>size-1){
@@ -168,32 +167,16 @@ public class MyAi {
         for(Map.Entry<String,Integer> dir: myMoves.entrySet()){
             if(dir.getValue()!= -1){
                 if(dir.getKey().equals("up")){
-                    if(canImakeThisMove(agent.getCurrentRow()-1, agent.getCurrentCol())){
-                        dir.setValue(this.knowledgeBase.cost[agent.getCurrentRow()-1][agent.getCurrentCol()]);
-                    }else{
-                        dir.setValue(-1);
-                    }
+                    dir.setValue(this.knowledgeBase.cost[agent.getCurrentRow()-1][agent.getCurrentCol()]);
                 }
                 else if(dir.getKey().equals("right")){
-                    if(canImakeThisMove(agent.getCurrentRow(), agent.getCurrentCol()+1)){
-                        dir.setValue(this.knowledgeBase.cost[agent.getCurrentRow()][agent.getCurrentCol()+1]);
-                    }else{
-                        dir.setValue(-1);
-                    }
+                    dir.setValue(this.knowledgeBase.cost[agent.getCurrentRow()][agent.getCurrentCol()+1]);
                 }
                 else if(dir.getKey().equals("down")){
-                    if(canImakeThisMove(agent.getCurrentRow()+1,agent.getCurrentCol() )){
-                        dir.setValue(this.knowledgeBase.cost[agent.getCurrentRow()+1][agent.getCurrentCol()]);
-                    }else{
-                        dir.setValue(-1);
-                    }
+                    dir.setValue(this.knowledgeBase.cost[agent.getCurrentRow()+1][agent.getCurrentCol()]);
                 }
                 else if(dir.getKey().equals("left")){
-                    if(canImakeThisMove(agent.getCurrentRow(), agent.getCurrentCol()-1)){
-                        dir.setValue(this.knowledgeBase.cost[agent.getCurrentRow()][agent.getCurrentCol()-1]);
-                    }else{
-                        dir.setValue(-1);
-                    }
+                    dir.setValue(this.knowledgeBase.cost[agent.getCurrentRow()][agent.getCurrentCol()-1]);
                 }
             }
         }
