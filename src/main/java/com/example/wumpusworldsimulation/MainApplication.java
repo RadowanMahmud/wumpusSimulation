@@ -30,6 +30,7 @@ public class MainApplication extends Application {
     GridPane gp = new GridPane();
     Circle circle =new Circle();
     String world[][];
+    int score = 0;
 
     Agent agent = new Agent();
     MyKnowledgeBase base = new MyKnowledgeBase();
@@ -83,6 +84,7 @@ public class MainApplication extends Application {
                 if(output.equals("wumpus")){
                     Image monster = new Image("monster.jpg",false);
                     recsmall.setFill(new ImagePattern(monster));
+                    recsmall.setId("wumpus");
                     GridPane.setRowIndex(recsmall, row);
                     GridPane.setColumnIndex(recsmall, col);
                     GridPane.setMargin(recsmall, new Insets(0,0,0,5));
@@ -282,6 +284,7 @@ public class MainApplication extends Application {
                     if(agent.getCurrentDirection().equals("up")){
                         changePlayerPosition(agent.getCurrentRow()-1, agent.getCurrentCol());
                     }else{
+                        score--;
                         Image im = new Image("back.png",false);
                         circle.setFill(new ImagePattern(im));
                         circle.setRadius(15);
@@ -295,6 +298,7 @@ public class MainApplication extends Application {
                     if(agent.getCurrentDirection().equals("right")){
                         changePlayerPosition(agent.getCurrentRow(), agent.getCurrentCol()+1);
                     }else{
+                        score--;
                         Image im = new Image("right_face.png",false);
                         circle.setFill(new ImagePattern(im));
                         circle.setRadius(15);
@@ -308,6 +312,7 @@ public class MainApplication extends Application {
                     if(agent.getCurrentDirection().equals("down")){
                         changePlayerPosition(agent.getCurrentRow()+1, agent.getCurrentCol());
                     }else{
+                        score--;
                         Image im = new Image("front_face.png",false);
                         circle.setFill(new ImagePattern(im));
                         circle.setRadius(15);
@@ -321,6 +326,7 @@ public class MainApplication extends Application {
                     if(agent.getCurrentDirection().equals("left")){
                         changePlayerPosition(agent.getCurrentRow(),agent.getCurrentCol()-1);
                     }else{
+                        score--;
                         Image im = new Image("left_face.png",false);
                         circle.setFill(new ImagePattern(im));
                         circle.setRadius(15);
@@ -330,13 +336,130 @@ public class MainApplication extends Application {
                         changePlayerPosition(agent.getCurrentRow(),agent.getCurrentCol()-1);
                     }
                 }
+                else if(direction.length() > 6){
+                    String arrowDirection = direction.split("#")[1];
+                    if(arrowDirection.contains("up")){
+                        System.out.println("wumpus at up");
+                        if(world[agent.getCurrentRow()-1][agent.getCurrentCol()].contains("wumpus")){
+                            if(agent.getCurrentDirection().equals("up")){
+                                Image im = new Image("shot_up.png",false);
+                                circle.setFill(new ImagePattern(im));
+                                circle.setRadius(15);
+                                GridPane.setRowIndex(circle,agent.getCurrentRow());
+                                GridPane.setColumnIndex(circle,agent.getCurrentCol());
+                                agent.setCurrentDirection("up");
+                                throwArow(agent.getCurrentRow()-1, agent.getCurrentCol());
+                            }
+                        }
+                    }else if(arrowDirection.contains("right")){
+                        System.out.println("wumpus at right");
+                        if(world[agent.getCurrentRow()][agent.getCurrentCol()+1].contains("wumpus")){
+                            if(agent.getCurrentDirection().equals("right")){
+                                Image im = new Image("shot_right.png",false);
+                                circle.setFill(new ImagePattern(im));
+                                circle.setRadius(15);
+                                GridPane.setRowIndex(circle,agent.getCurrentRow());
+                                GridPane.setColumnIndex(circle,agent.getCurrentCol());
+                                agent.setCurrentDirection("right");
+                                throwArow(agent.getCurrentRow(), agent.getCurrentCol()+1);
+                            }
+                        }
+                    }else if(arrowDirection.contains("down")){
+                        System.out.println("wumpus at down");
+                        if(world[agent.getCurrentRow()+1][agent.getCurrentCol()].contains("wumpus")){
+                            if(agent.getCurrentDirection().equals("down")){
+                                Image im = new Image("shot_down.png",false);
+                                circle.setFill(new ImagePattern(im));
+                                circle.setRadius(15);
+                                GridPane.setRowIndex(circle,agent.getCurrentRow());
+                                GridPane.setColumnIndex(circle,agent.getCurrentCol());
+                                agent.setCurrentDirection("down");
+                                throwArow(agent.getCurrentRow()+1, agent.getCurrentCol());
+                            }
+                        }
+                    }else if(arrowDirection.contains("left")){
+                        System.out.println("wumpus at left");
+                        if(world[agent.getCurrentRow()][agent.getCurrentCol()-1].contains("wumpus")){
+                            if(agent.getCurrentDirection().equals("left")){
+                                Image im = new Image("shot_left.png",false);
+                                circle.setFill(new ImagePattern(im));
+                                circle.setRadius(15);
+                                GridPane.setRowIndex(circle,agent.getCurrentRow());
+                                GridPane.setColumnIndex(circle,agent.getCurrentCol());
+                                agent.setCurrentDirection("left");
+                                throwArow(agent.getCurrentRow(),agent.getCurrentCol()-1);
+                            }
+                        }
+                    }
+                }
             }
         });
         simulate.start();
     }
+    public boolean isItLegalToUseTheBox(int row , int col){
+        if(row<0 || row>9 || col<0 || col>9){
+            return false;
+        }
+        return true;
+    }
+    public void chnageWorld(int row , int col){
+        if(world[row][col].equals("stench")){
+            world[row][col] = " ";
+        }
+        else if(world[row][col].contains("stench")){
+            world[row][col] = world[row][col].replace("stench","");
+        }
+    }
+    public void throwArow(int row, int col){
+        score-=10;
+        world[row][col]=" ";
+        Rectangle c = (Rectangle) gp.lookup("#wumpus");
+        System.out.println(c);
+        try {
+            Platform.runLater(new Runnable(){
+                @Override
+                public void run() {
+                    gp.getChildren().remove(c);
+//                    String ssound = "sound.mp3";
+//                    Media sound = new Media(ssound);
+//                    MediaPlayer mediaPlayer = new MediaPlayer(sound);
+//                    mediaPlayer.play();
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.getButtonTypes().remove(ButtonType.OK);
+                    alert.getButtonTypes().add(ButtonType.CANCEL);
+                    alert.setTitle("Arrow Thrown");
+                    alert.setHeaderText("WUMPUS Killed !!!!!!");
+                    alert.show();
+                    try {
+                        Thread.sleep(1500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            if(isItLegalToUseTheBox(row-1,col)){
+                chnageWorld(row-1,col);
+            }
+            if(isItLegalToUseTheBox(row+1,col)){
+                chnageWorld(row+1,col);
+
+            }
+            if(isItLegalToUseTheBox(row,col+1)){
+                chnageWorld(row,col+1);
+
+            }
+            if(isItLegalToUseTheBox(row,col-1)){
+                chnageWorld(row,col-1);
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public void changePlayerPosition( int row ,int col)
     {
+        score--;
         agent.setCurrentCol(col);
         agent.setCurrentRow(row);
         GridPane.setRowIndex(circle, row);
@@ -387,12 +510,14 @@ public class MainApplication extends Application {
             Platform.runLater(new Runnable(){
                 @Override
                 public void run() {
+                    score = score - 1000;
                     Alert alert = new Alert(Alert.AlertType.WARNING);
                     alert.getButtonTypes().remove(ButtonType.OK);
                     alert.getButtonTypes().add(ButtonType.CANCEL);
                     alert.setTitle("GameOver");
                     alert.setHeaderText("Pit!!!!!!");
                     alert.setContentText(String.format("You fell in a pit"));
+                    alert.setContentText(String.format("Score is "+score));
                     Optional<ButtonType> res = alert.showAndWait();
 
                     if(res.isPresent()) {
@@ -413,12 +538,14 @@ public class MainApplication extends Application {
             Platform.runLater(new Runnable(){
                 @Override
                 public void run() {
+                    score+=1000;
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.getButtonTypes().remove(ButtonType.OK);
                     alert.getButtonTypes().add(ButtonType.CANCEL);
                     alert.setTitle("VIctory");
                     alert.setHeaderText("Gold$$$$");
                     alert.setContentText(String.format("Congratulations, You won"));
+                    alert.setContentText(String.format("Score is "+score));
                     Optional<ButtonType> res = alert.showAndWait();
                     if(res.isPresent()) {
                         if(res.get().equals(ButtonType.CANCEL));

@@ -30,12 +30,64 @@ public class MyAi {
         if(this.realWorld[agent.getCurrentRow()][agent.getCurrentCol()].contains("glitter")){
             return glitterFound();
         }
-        if(deadLoack.determineDeadlock(this.knowledgeBase,this.agent)){
-                         System.out.println("Its a dead lock");
-                return "dead";
+//        if(this.realWorld[agent.getCurrentRow()][agent.getCurrentCol()].contains("stench")){
+//            return wumpusAround();
+//        }
+//        if(deadLoack.determineDeadlock(this.knowledgeBase,this.agent)){
+//            System.out.println("Its a dead lock");
+//            return dead();
+//        }
+        else return normalMove();
+    }
+    public String dead(){
+        int[] move= new int[]{0, 0, 0, 0};
+        if(isItLegalToUseTheBox(agent.getCurrentRow()-1, agent.getCurrentCol()) && knowledgeBase.base[agent.getCurrentRow()-1][agent.getCurrentCol()].equals("#")){
+            move[0]=1;
+        }
+        if(isItLegalToUseTheBox(agent.getCurrentRow(), agent.getCurrentCol()+1) && knowledgeBase.base[agent.getCurrentRow()][agent.getCurrentCol()+1].equals("#")){
+            move[1]=1;
+        }
+        if(isItLegalToUseTheBox(agent.getCurrentRow()+1, agent.getCurrentCol()) && knowledgeBase.base[agent.getCurrentRow()+1][agent.getCurrentCol()].equals("#")){
+            move[2]=1;
+        }
+        if(isItLegalToUseTheBox(agent.getCurrentRow(), agent.getCurrentCol()-1) && knowledgeBase.base[agent.getCurrentRow()][agent.getCurrentCol()-1].equals("#")){
+            move[3]=1;
+        }
+        for(int i=0;i<4;i++){
+            if(move[i]==1){
+                if(i==0) return "up";
+                if(i==1) return "right";
+                if(i==2) return "down";
+                if(i==3) return "up";
+            }
+        }
+        return "right";
+    }
+    public void chnageWorld(int row , int col){
+        if(knowledgeBase.base[row][col].equals("stench")){
+            knowledgeBase.base[row][col] = " ";
+        }
+        else if(knowledgeBase.base[row][col].contains("stench")){
+            knowledgeBase.base[row][col] = knowledgeBase.base[row][col].replace("stench","");
+        }
+    }
+    public void setBaseonArow(int row,int col){
+        knowledgeBase.base[row][col]=" ";
+        if(isItLegalToUseTheBox(row-1,col)){
+            chnageWorld(row-1,col);
+        }
+        if(isItLegalToUseTheBox(row+1,col)){
+            chnageWorld(row+1,col);
 
         }
-        else return normalMove();
+        if(isItLegalToUseTheBox(row,col+1)){
+            chnageWorld(row,col+1);
+
+        }
+        if(isItLegalToUseTheBox(row,col-1)){
+            chnageWorld(row,col-1);
+
+        }
     }
     public String glitterFound(){
         if(isItLegalToUseTheBox(agent.getCurrentRow()-1, agent.getCurrentCol())){
@@ -83,6 +135,57 @@ public class MyAi {
             if(isItLegalToUseTheBox(agent.getCurrentRow()-1, agent.getCurrentCol()-1)) {
                 if(this.knowledgeBase.base[agent.getCurrentRow()-1][agent.getCurrentCol()-1].contains("glitter")){
                     return "up";
+                }
+            }
+        }
+        return normalMove();
+    }
+    public String wumpusAround(){
+        if(isItLegalToUseTheBox(agent.getCurrentRow()-1, agent.getCurrentCol())){
+            if(isItLegalToUseTheBox(agent.getCurrentRow()-1, agent.getCurrentCol()+1)){
+                if(this.knowledgeBase.base[agent.getCurrentRow()-1][agent.getCurrentCol()+1].contains("stench")){
+                    return "wumpus on #right";
+                }
+            }
+            if(isItLegalToUseTheBox(agent.getCurrentRow()-1, agent.getCurrentCol()-1)) {
+                if(this.knowledgeBase.base[agent.getCurrentRow()-1][agent.getCurrentCol()-1].contains("stench")){
+                    return "wumpus on #left";
+                }
+            }
+        }
+        if(isItLegalToUseTheBox(agent.getCurrentRow(), agent.getCurrentCol()+1)){
+            if(isItLegalToUseTheBox(agent.getCurrentRow()+1, agent.getCurrentCol()+1)){
+                if(this.knowledgeBase.base[agent.getCurrentRow()+1][agent.getCurrentCol()+1].contains("stench")){
+                    return "wumpus on #down";
+                }
+            }
+            if(isItLegalToUseTheBox(agent.getCurrentRow()-1, agent.getCurrentCol()+1)) {
+                if(this.knowledgeBase.base[agent.getCurrentRow()-1][agent.getCurrentCol()+1].contains("stench")){
+                    return "wumpus #up";
+                }
+            }
+        }
+        if(isItLegalToUseTheBox(agent.getCurrentRow()+1, agent.getCurrentCol())){
+            if(isItLegalToUseTheBox(agent.getCurrentRow()+1, agent.getCurrentCol()+1)){
+                if(this.knowledgeBase.base[agent.getCurrentRow()+1][agent.getCurrentCol()+1].contains("stench")){
+                    return "wumpus on #right";
+                }
+            }
+            if(isItLegalToUseTheBox(agent.getCurrentRow()+1, agent.getCurrentCol()-1)) {
+                if(this.knowledgeBase.base[agent.getCurrentRow()+1][agent.getCurrentCol()-1].contains("stench")){
+                    return "wumpus on #left";
+                }
+            }
+        }
+        if(isItLegalToUseTheBox(agent.getCurrentRow(), agent.getCurrentCol()-1)){
+            if(isItLegalToUseTheBox(agent.getCurrentRow()+1, agent.getCurrentCol()-1)){
+                if(this.knowledgeBase.base[agent.getCurrentRow()+1][agent.getCurrentCol()-1].contains("stench")){
+                    return "wumpus on #down";
+                }
+            }
+            if(isItLegalToUseTheBox(agent.getCurrentRow()-1, agent.getCurrentCol()-1)) {
+                if(this.knowledgeBase.base[agent.getCurrentRow()-1][agent.getCurrentCol()-1].contains("stench")){
+                    return "wumpus on #up";
                 }
             }
         }

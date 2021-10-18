@@ -10,7 +10,7 @@ public class WumpusWorldGenerator {
         prepareBoard();
         setGoldInBoard();
         placeWumpusOnBoard(1);
-        int pitNumber = raandom.nextInt(5)+15;
+        int pitNumber = raandom.nextInt(5)+5;
         for(int i=0;i<pitNumber;i++){
             placePitsOnBoard();
         }
