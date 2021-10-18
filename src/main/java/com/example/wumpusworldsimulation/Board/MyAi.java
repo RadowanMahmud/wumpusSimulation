@@ -30,15 +30,11 @@ public class MyAi {
         if(this.realWorld[agent.getCurrentRow()][agent.getCurrentCol()].contains("glitter")){
             return glitterFound();
         }
-//        if(this.realWorld[agent.getCurrentRow()][agent.getCurrentCol()].contains("breeze")){
-//            System.out.println("breeze deadlock check"+agent.getCurrentRow()+agent.getCurrentCol());
-//            deadLoack.setMyBase(this.knowledgeBase.base);
-//            if(deadLoack.isItDeadLock(agent.getCurrentRow(), agent.getCurrentCol())){
-//                System.out.println("Its a dead lock");
-//                return "dead";
-//            }
-//            return normalMove();
-//        }
+        if(deadLoack.determineDeadlock(this.knowledgeBase,this.agent)){
+                         System.out.println("Its a dead lock");
+                return "dead";
+
+        }
         else return normalMove();
     }
     public String glitterFound(){
@@ -92,6 +88,7 @@ public class MyAi {
         }
         return normalMove();
     }
+
     public String normalMove(){
         myAvailableMoves();
         mySafeMoves();
@@ -108,6 +105,7 @@ public class MyAi {
         setBasicMap();
         return finalMove;
     }
+
     public void updateBase(int row,int col){
         this.knowledgeBase.cost[row][col]++;
         this.knowledgeBase.base[row][col] = this.realWorld[row][col];
@@ -129,6 +127,7 @@ public class MyAi {
         }
         return move;
     }
+
     public boolean canImakeThisMove(int row,int col){
         if(isItLegalToUseTheBox(row,col+1)){
             if(!this.knowledgeBase.base[row][col+1].equals("#") && !this.knowledgeBase.base[row][col+1].contains("breeze")
