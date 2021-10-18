@@ -278,10 +278,58 @@ public class MainApplication extends Application {
                 }
                 // int dir = pickMove();
                 String direction= ai.whereSHouldIgo();
-                if(direction.equals("up")) changePlayerPosition( agent.getCurrentRow()-1, agent.getCurrentCol());
-                else if(direction.equals("right")) changePlayerPosition( agent.getCurrentRow(),agent.getCurrentCol()+1);
-                else if(direction.equals("down")) changePlayerPosition(agent.getCurrentRow()+1,agent.getCurrentCol());
-                else if(direction.equals("left")) changePlayerPosition( agent.getCurrentRow(),agent.getCurrentCol()-1);
+                if(direction.equals("up")){
+                    if(agent.getCurrentDirection().equals("up")){
+                        changePlayerPosition(agent.getCurrentRow()-1, agent.getCurrentCol());
+                    }else{
+                        Image im = new Image("back.png",false);
+                        circle.setFill(new ImagePattern(im));
+                        circle.setRadius(15);
+                        GridPane.setRowIndex(circle,agent.getCurrentRow());
+                        GridPane.setColumnIndex(circle,agent.getCurrentCol());
+                        agent.setCurrentDirection("up");
+                        changePlayerPosition(agent.getCurrentRow()-1, agent.getCurrentCol());
+                    }
+                }
+                else if(direction.equals("right")) {
+                    if(agent.getCurrentDirection().equals("right")){
+                        changePlayerPosition(agent.getCurrentRow(), agent.getCurrentCol()+1);
+                    }else{
+                        Image im = new Image("right_face.png",false);
+                        circle.setFill(new ImagePattern(im));
+                        circle.setRadius(15);
+                        GridPane.setRowIndex(circle,agent.getCurrentRow());
+                        GridPane.setColumnIndex(circle,agent.getCurrentCol());
+                        agent.setCurrentDirection("right");
+                        changePlayerPosition(agent.getCurrentRow(), agent.getCurrentCol()+1);
+                    }
+                }
+                else if(direction.equals("down")) {
+                    if(agent.getCurrentDirection().equals("down")){
+                        changePlayerPosition(agent.getCurrentRow()+1, agent.getCurrentCol());
+                    }else{
+                        Image im = new Image("front_face.png",false);
+                        circle.setFill(new ImagePattern(im));
+                        circle.setRadius(15);
+                        GridPane.setRowIndex(circle,agent.getCurrentRow());
+                        GridPane.setColumnIndex(circle,agent.getCurrentCol());
+                        agent.setCurrentDirection("down");
+                        changePlayerPosition(agent.getCurrentRow()+1, agent.getCurrentCol());
+                    }
+                }
+                else if(direction.equals("left")) {
+                    if(agent.getCurrentDirection().equals("left")){
+                        changePlayerPosition(agent.getCurrentRow(),agent.getCurrentCol()-1);
+                    }else{
+                        Image im = new Image("left_face.png",false);
+                        circle.setFill(new ImagePattern(im));
+                        circle.setRadius(15);
+                        GridPane.setRowIndex(circle,agent.getCurrentRow());
+                        GridPane.setColumnIndex(circle,agent.getCurrentCol());
+                        agent.setCurrentDirection("left");
+                        changePlayerPosition(agent.getCurrentRow(),agent.getCurrentCol()-1);
+                    }
+                }
             }
         });
         simulate.start();
