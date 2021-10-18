@@ -44,6 +44,10 @@ public class MainApplication extends Application {
     public void start(Stage stage) throws IOException {
 
         WumpusWorldGenerator generator= new WumpusWorldGenerator();
+//        Scanner cin = new Scanner(System.in);
+//        System.out.println("Random or Customize");
+//        String l;
+//        l = cin.nextLine();
         world = generator.getGeneratedBoard();
 
         VBox vbox = new VBox();
@@ -260,6 +264,28 @@ public class MainApplication extends Application {
                             case F10: {
                                 System.out.println("F10 pressed");
                                 removeCover();
+                                break;
+                            }
+                            case F11: {
+                                for(int i=0;i<10;i++){
+                                    for(int j=0;j<10;j++){
+                                        Rectangle c = (Rectangle) gp.lookup("#cover"+i+j);
+                                        if(c==null){
+                                            Rectangle coverRec= new Rectangle();
+                                            Image coverImage = new Image("grass.jpg",false);
+                                            coverRec.setHeight(65);
+                                            coverRec.setWidth(65);
+                                            coverRec.setFill(new ImagePattern(coverImage));
+                                            coverRec.setId("cover"+i+j);
+                                            GridPane.setRowIndex(coverRec, i);
+                                            GridPane.setColumnIndex(coverRec, j);
+                                            if(i == 0 && j ==0) continue;
+                                            gp.getChildren().add(coverRec);
+                                        }
+
+                                    }
+                                }
+                                break;
                             }
                         }
                     }
@@ -406,6 +432,7 @@ public class MainApplication extends Application {
     public void throwArow(int row, int col){
         score-=10;
         world[row][col]=" ";
+        MyAi.numberOfArrow--;
         Rectangle c = (Rectangle) gp.lookup("#wumpus");
         System.out.println(c);
         try {

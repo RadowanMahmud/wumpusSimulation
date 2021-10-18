@@ -9,6 +9,7 @@ public class MyAi {
     public int size;
     public Map<String,Integer> myMoves=new HashMap<String,Integer>();
     public DeadLoack deadLoack = new DeadLoack();
+    public static int numberOfArrow=1;
     String realWorld[][];
     public MyAi(MyKnowledgeBase knowledgeBase,Agent agent, int size, String[][] world){
         setBasicMap();
@@ -27,16 +28,16 @@ public class MyAi {
 
 
     public String whereSHouldIgo(){
-        if(this.realWorld[agent.getCurrentRow()][agent.getCurrentCol()].contains("glitter")){
-            return glitterFound();
-        }
-        if(this.realWorld[agent.getCurrentRow()][agent.getCurrentCol()].contains("stench")){
+//        if(this.realWorld[agent.getCurrentRow()][agent.getCurrentCol()].contains("glitter")){
+//            return glitterFound();
+//        }
+        if(this.realWorld[agent.getCurrentRow()][agent.getCurrentCol()].contains("stench") && numberOfArrow==0){
             return wumpusAround();
         }
-        if(deadLoack.determineDeadlock(this.knowledgeBase,this.agent)){
-            System.out.println("Its a dead lock");
-            return dead();
-        }
+//        if(deadLoack.determineDeadlock(this.knowledgeBase,this.agent)){
+//            System.out.println("Its a dead lock");
+//            return dead();
+//        }
         else return normalMove();
     }
     public String dead(){
@@ -53,15 +54,25 @@ public class MyAi {
         if(isItLegalToUseTheBox(agent.getCurrentRow(), agent.getCurrentCol()-1) && knowledgeBase.base[agent.getCurrentRow()][agent.getCurrentCol()-1].equals("#")){
             move[3]=1;
         }
+//        for(int i=0;i<4;i++){
+//            if(move[i]==1){
+//
+//            }
+//        }
+        int mincost  = 9999;
+        String movedir = "";
         for(int i=0;i<4;i++){
-            if(move[i]==1){
-                if(i==0) return "up";
-                if(i==1) return "right";
-                if(i==2) return "down";
-                if(i==3) return "up";
+            if(move[i]>-1){
+                if(move[i] <mincost){
+                    mincost = move[i];
+                    if(i==0) movedir="up";
+                    else if(i==1) movedir="right";
+                    else if(i==2) movedir="down";
+                    else if(i==3) movedir="up";
+                }
             }
         }
-        return "right";
+        return movedir;
     }
     public void chnageWorld(int row , int col){
         if(knowledgeBase.base[row][col].equals("stench")){
@@ -212,9 +223,9 @@ public class MyAi {
     public void updateBase(int row,int col){
         this.knowledgeBase.cost[row][col]++;
         this.knowledgeBase.base[row][col] = this.realWorld[row][col];
-//        System.out.println(row +" "+ col);
-//        System.out.println(knowledgeBase.base[row][col]);
-//        System.out.println(knowledgeBase.cost[row][col]);
+        System.out.println(row +" "+ col);
+        System.out.println(knowledgeBase.base[row][col]);
+        System.out.println(knowledgeBase.cost[row][col]);
     }
 
     public String finalMove(){
