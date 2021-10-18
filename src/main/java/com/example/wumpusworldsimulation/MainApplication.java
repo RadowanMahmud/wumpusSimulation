@@ -341,7 +341,6 @@ public class MainApplication extends Application {
                     if(arrowDirection.contains("up")){
                         System.out.println("wumpus at up");
                         if(world[agent.getCurrentRow()-1][agent.getCurrentCol()].contains("wumpus")){
-                            if(agent.getCurrentDirection().equals("up")){
                                 Image im = new Image("shot_up.png",false);
                                 circle.setFill(new ImagePattern(im));
                                 circle.setRadius(15);
@@ -349,12 +348,10 @@ public class MainApplication extends Application {
                                 GridPane.setColumnIndex(circle,agent.getCurrentCol());
                                 agent.setCurrentDirection("up");
                                 throwArow(agent.getCurrentRow()-1, agent.getCurrentCol());
-                            }
                         }
                     }else if(arrowDirection.contains("right")){
                         System.out.println("wumpus at right");
                         if(world[agent.getCurrentRow()][agent.getCurrentCol()+1].contains("wumpus")){
-                            if(agent.getCurrentDirection().equals("right")){
                                 Image im = new Image("shot_right.png",false);
                                 circle.setFill(new ImagePattern(im));
                                 circle.setRadius(15);
@@ -362,12 +359,11 @@ public class MainApplication extends Application {
                                 GridPane.setColumnIndex(circle,agent.getCurrentCol());
                                 agent.setCurrentDirection("right");
                                 throwArow(agent.getCurrentRow(), agent.getCurrentCol()+1);
-                            }
+
                         }
                     }else if(arrowDirection.contains("down")){
                         System.out.println("wumpus at down");
                         if(world[agent.getCurrentRow()+1][agent.getCurrentCol()].contains("wumpus")){
-                            if(agent.getCurrentDirection().equals("down")){
                                 Image im = new Image("shot_down.png",false);
                                 circle.setFill(new ImagePattern(im));
                                 circle.setRadius(15);
@@ -375,12 +371,10 @@ public class MainApplication extends Application {
                                 GridPane.setColumnIndex(circle,agent.getCurrentCol());
                                 agent.setCurrentDirection("down");
                                 throwArow(agent.getCurrentRow()+1, agent.getCurrentCol());
-                            }
                         }
                     }else if(arrowDirection.contains("left")){
                         System.out.println("wumpus at left");
                         if(world[agent.getCurrentRow()][agent.getCurrentCol()-1].contains("wumpus")){
-                            if(agent.getCurrentDirection().equals("left")){
                                 Image im = new Image("shot_left.png",false);
                                 circle.setFill(new ImagePattern(im));
                                 circle.setRadius(15);
@@ -388,7 +382,6 @@ public class MainApplication extends Application {
                                 GridPane.setColumnIndex(circle,agent.getCurrentCol());
                                 agent.setCurrentDirection("left");
                                 throwArow(agent.getCurrentRow(),agent.getCurrentCol()-1);
-                            }
                         }
                     }
                 }

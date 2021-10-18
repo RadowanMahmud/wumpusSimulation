@@ -30,9 +30,9 @@ public class MyAi {
         if(this.realWorld[agent.getCurrentRow()][agent.getCurrentCol()].contains("glitter")){
             return glitterFound();
         }
-//        if(this.realWorld[agent.getCurrentRow()][agent.getCurrentCol()].contains("stench")){
-//            return wumpusAround();
-//        }
+        if(this.realWorld[agent.getCurrentRow()][agent.getCurrentCol()].contains("stench")){
+            return wumpusAround();
+        }
 //        if(deadLoack.determineDeadlock(this.knowledgeBase,this.agent)){
 //            System.out.println("Its a dead lock");
 //            return dead();
