@@ -33,10 +33,10 @@ public class MyAi {
         if(this.realWorld[agent.getCurrentRow()][agent.getCurrentCol()].contains("stench")){
             return wumpusAround();
         }
-//        if(deadLoack.determineDeadlock(this.knowledgeBase,this.agent)){
-//            System.out.println("Its a dead lock");
-//            return dead();
-//        }
+        if(deadLoack.determineDeadlock(this.knowledgeBase,this.agent)){
+            System.out.println("Its a dead lock");
+            return dead();
+        }
         else return normalMove();
     }
     public String dead(){
